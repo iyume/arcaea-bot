@@ -12,18 +12,18 @@ nonebot 插件位于`nonebot2/*`，使用前请在 nonebot 目录下创建对应
 
 根据 QQ 号储存用户信息
 
-*Commands*
-`//a recent`
-`//a b30`
-`//a register [code]`
-`//a removeuser [code]`
-`//get_user_list`
+**Commands**
+- `//a recent`
+- `//a b30`
+- `//a register [code]`
+- `//a removeuser [code]`
+- `//get_user_list`
 
 ## 现有 arcbot
 3520438881
 
 ## requirements
-`Arc-api`
-`Image`
-`pandas`
-`nb-cli`
+- `Arc-api`
+- `Image`
+- `pandas`
+- `nb-cli`
