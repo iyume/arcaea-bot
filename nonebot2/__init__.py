@@ -10,7 +10,7 @@ import asyncio
 import base64
 
 from .adduser import *
-from .arcapi import genimg, getrecent, getbest30
+from .arcapi import genimg, getrecent, getbest30, getuserinfo
 
 
 command_list = on_command('help', aliases={'command'})
@@ -37,14 +37,33 @@ async def handle_first_receive(bot: Bot, event: Event, state: T_State):
 @arcbot.got('arg', prompt='参数见 help')
 async def handle_best30(bot: Bot, event: Event, state: T_State):
 
-    if state['arg'] == 'recent' and str(event.get_session_id()) in str(showuser()):
-        try:
-            code = qqnum2code(int(event.get_session_id()))
-            recent = await getrecent(code)
-            await bot.send(message=recent, event=event)
-        except:
-            await bot.send(message='查询失败了~', event=event)
+    userlst = str(showuser())
 
+    if state['arg'] == 'userinfo':
+        if str(event.get_session_id()) in userlst:
+            try:
+                code = qqnum2code(int(event.get_session_id()))
+                userinfo = await getuserinfo(code)
+                await bot.send(message=str(userinfo), event=event)
+            except:
+                await bot.send(message='失败了~', event=event)
+        else:
+            await bot.send(message='未注册', event=event)
+        await arcbot.finish()
+
+
+    if state['arg'] == 'recent':
+        if str(event.get_session_id()) in userlst:
+
+            try:
+                code = qqnum2code(int(event.get_session_id()))
+                recent = await getrecent(code)
+                await bot.send(message=str(recent), event=event)
+            except:
+                await bot.send(message='失败了~', event=event)
+
+        else:
+            await bot.send(message='未注册', event=event)
         await arcbot.finish()
 
 
@@ -73,11 +92,14 @@ async def handle_best30(bot: Bot, event: Event, state: T_State):
         await arcbot.finish()
 
 
-    if state['arg'].split(' ')[0] == 'register':
-        code = state['arg'].split(' ')[1] or ''
+    if state['arg'].split(' ')[0] == 'register' or 'bind':
+        code = state['arg'].split(' ')[-1] or ''
         if len(code) == 9:
-            adduser(int(code), int(event.get_session_id()))
-            await bot.send(message='Success', event=event)
+            if event.get_session_id() not in userlst:
+                adduser(int(code), int(event.get_session_id()))
+                await bot.send(message='Success', event=event)
+            else:
+                await bot.send(message='已注册', event=event)
         else:
             await bot.send(message='Code invalid', event=event)
 

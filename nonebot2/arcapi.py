@@ -9,7 +9,7 @@ async def fetch(target, client):
     return await client.get(target)
 
 
-async def genimg(code:int):
+async def genimg(code: str):
     api = SyncApi(str(code))
     raw = api.userbest30()
 
@@ -63,7 +63,7 @@ async def genimg(code:int):
     return save_to
 
 
-async def getrecent(code:int) -> str:
+async def getrecent(code: str) -> str:
     api = SyncApi(str(code))
     raw = api.userbest30()
     recent = raw[1]['recent_score'][0]
@@ -74,7 +74,7 @@ async def getrecent(code:int) -> str:
     return '\n'.join([recent['song_id'].title(), "Score: " + str(recent['score']), "PTT: " + f"{recent['rating']:.2f}"])
 
 
-async def getbest30(code: int) -> str:
+async def getbest30(code: str) -> str:
 
     async with httpx.AsyncClient(timeout=None) as client:
         r = await asyncio.gather(fetch(f'http://127.0.0.1:9091/v3/userbest30?usercode={code}', client))
@@ -137,3 +137,19 @@ async def getbest30(code: int) -> str:
         return save_to
 
     return await _getbest30(jsn)
+
+
+async def getuserinfo(code: str) -> str:
+
+    async with httpx.AsyncClient(timeout=None) as client:
+        r = await asyncio.gather(fetch(f'http://127.0.0.1:9091/v3/userbest30?usercode={code}', client))
+
+    jsn = r[0].json()
+    async def _getuserinfo(jsn):
+        content = jsn['content']
+        b30_avg = f"b30 平均值: {content['best30_avg']}"
+        r10_avg = f"r10 平均值: {content['recent10_avg']}"
+        result = '\n'.join([b30_avg, r10_avg])
+        return result
+
+    return await _getuserinfo(jsn)
